@@ -1,0 +1,130 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: Telegram Bot API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: stats
+    description: Bot statistics
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /stats:
+    get:
+      operationId: getStats
+      tags: [stats]
+      summary: Get bot statistics overview
+      responses:
+        "200":
+          description: Stats data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BotStats"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+
+    StatsOverview:
+      type: object
+      required: [totalUsers, totalFiles, totalSearches, totalMessages, pptxCount, wordCount]
+      properties:
+        totalUsers:
+          type: integer
+        totalFiles:
+          type: integer
+        totalSearches:
+          type: integer
+        totalMessages:
+          type: integer
+        pptxCount:
+          type: integer
+        wordCount:
+          type: integer
+
+    FileRecord:
+      type: object
+      required: [userId, userName, type, topic, createdAt]
+      properties:
+        userId:
+          type: string
+        userName:
+          type: string
+        type:
+          type: string
+          enum: [pptx, word]
+        topic:
+          type: string
+        createdAt:
+          type: string
+
+    SearchRecord:
+      type: object
+      required: [userId, userName, query, resultCount, searchedAt]
+      properties:
+        userId:
+          type: string
+        userName:
+          type: string
+        query:
+          type: string
+        resultCount:
+          type: integer
+        searchedAt:
+          type: string
+
+    UserRecord:
+      type: object
+      required: [userId, userName, firstSeen, lastSeen, messageCount]
+      properties:
+        userId:
+          type: string
+        userName:
+          type: string
+        firstSeen:
+          type: string
+        lastSeen:
+          type: string
+        messageCount:
+          type: integer
+
+    BotStats:
+      type: object
+      required: [overview, recentFiles, recentSearches, recentUsers]
+      properties:
+        overview:
+          $ref: "#/components/schemas/StatsOverview"
+        recentFiles:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileRecord"
+        recentSearches:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchRecord"
+        recentUsers:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserRecord"
